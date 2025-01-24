@@ -1,6 +1,20 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Param,
+  ParseIntPipe,
+  DefaultValuePipe,
+  Post,
+  ValidationPipe,
+  Body,
+  HttpCode,
+  Put,
+} from '@nestjs/common';
 import { Type } from 'class-transformer';
 import { IsOptional, IsInt } from 'class-validator';
+import { UserSignupRequestDto } from './dtos/request/user.signup.request.dto';
+import { UserUpdateRequestDto } from './dtos/request/user.update.request';
 
 export class GetUserDetailsParamsDto {
   @Type(() => Number) // Transforms the value to a number
@@ -23,8 +37,16 @@ export class GetUsersQueryDto {
 @Controller('users')
 export class UserController {
   @Get()
-  getUsers(@Query() query: GetUsersQueryDto) {
-    console.log(typeof query.page);
+  getUsers(
+    // @Query() query: GetUsersQueryDto
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
+    // console.log(typeof query.page);
+    console.log(limit);
+    console.log(page);
+    console.log(typeof limit);
+    console.log(typeof page);
 
     const user = [
       {
@@ -38,10 +60,36 @@ export class UserController {
     return user;
   }
 
+  @Post('/signup')
+  @HttpCode(200)
+  signUp(@Body(new ValidationPipe()) body: UserSignupRequestDto) {
+    const user = body;
+
+    return {
+      message: `A new user has been created`,
+      email: user.email,
+    };
+  }
+
+  @Put(':id')
+  updateUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UserUpdateRequestDto,
+  ) {
+    const userId = id;
+    const user = body;
+    console.log(user);
+
+    return {
+      message: `User with id ${userId} has been updated`,
+      user,
+    };
+  }
+
   @Get(':id')
-  getUserById(@Param() params: GetUserDetailsParamsDto) {
-    const id = params.id;
-    console.log(typeof id);
+  getUserById(@Param('id', ParseIntPipe) id: number) {
+    const userId = id;
+    console.log(typeof userId);
     const user = {
       id: 3,
       name: 'test',
