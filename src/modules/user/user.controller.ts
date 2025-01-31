@@ -15,6 +15,7 @@ import { Type } from 'class-transformer';
 import { IsOptional, IsInt } from 'class-validator';
 import { UserSignupRequestDto } from './dtos/request/user.signup.request.dto';
 import { UserUpdateRequestDto } from './dtos/request/user.update.request';
+import { UserService } from './user.service';
 
 export class GetUserDetailsParamsDto {
   @Type(() => Number) // Transforms the value to a number
@@ -36,8 +37,9 @@ export class GetUsersQueryDto {
 
 @Controller('users')
 export class UserController {
+  constructor(private readonly usersService: UserService) {}
   @Get()
-  getUsers(
+  async getUsers(
     // @Query() query: GetUsersQueryDto
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -45,19 +47,12 @@ export class UserController {
     // console.log(typeof query.page);
     console.log(limit);
     console.log(page);
-    console.log(typeof limit);
-    console.log(typeof page);
+    // console.log(typeof limit);
+    // console.log(typeof page);
 
-    const user = [
-      {
-        id: 3,
-        name: 'test',
-        age: 23,
-        gender: 'male',
-      },
-    ];
+    const users = await this.usersService.getAllUsers();
 
-    return user;
+    return users;
   }
 
   @Post('/signup')

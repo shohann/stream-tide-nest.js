@@ -1,0 +1,9 @@
+services:
+  chat_db:
+    image: postgres:16.2
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=chat_db_user
+      - POSTGRES_DB=chat_db
+    ports:
+      - 5431:5432
