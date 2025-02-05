@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/stream-tide-nest.js/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/stream-tide-nest.js/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/stream-tide-nest.js",
+  "projects": {
+    "stream-tide-nest.js": {
+      "type": "application",
+      "root": "apps/stream-tide-nest.js",
+      "entryFile": "main",
+      "sourceRoot": "apps/stream-tide-nest.js/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/stream-tide-nest.js/tsconfig.app.json"
+      }
+    },
+    "gateway-service": {
+      "type": "application",
+      "root": "apps/gateway-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gateway-service/tsconfig.app.json"
+      }
+    }
   }
 }
