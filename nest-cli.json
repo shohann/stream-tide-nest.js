@@ -1,14 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/stream-tide-nest.js/src",
+  "sourceRoot": "apps/gateway-service/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/stream-tide-nest.js/tsconfig.app.json"
+    "tsConfigPath": "apps/gateway-service/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/stream-tide-nest.js",
+  "root": "apps/gateway-service",
   "projects": {
     "stream-tide-nest.js": {
       "type": "application",
@@ -26,6 +26,15 @@
       "sourceRoot": "apps/gateway-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/gateway-service/tsconfig.app.json"
+      }
+    },
+    "notification-service": {
+      "type": "application",
+      "root": "apps/notification-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification-service/tsconfig.app.json"
       }
     }
   }
