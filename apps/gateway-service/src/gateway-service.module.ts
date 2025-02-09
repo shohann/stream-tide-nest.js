@@ -2,9 +2,14 @@ import { Module } from '@nestjs/common';
 import { GatewayServiceController } from './gateway-service.controller';
 import { GatewayServiceService } from './gateway-service.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { KafkaModule } from '@app/kafka';
+import { AppConfigModule } from '@app/config';
+import { TestConsumer } from './consumer';
 
 @Module({
   imports: [
+    AppConfigModule,
+    KafkaModule,
     ClientsModule.register([
       {
         name: 'NOTIFICATION_SERVICE',
@@ -22,6 +27,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ]),
   ],
   controllers: [GatewayServiceController],
-  providers: [GatewayServiceService],
+  providers: [GatewayServiceService, TestConsumer],
 })
 export class GatewayServiceModule {}
