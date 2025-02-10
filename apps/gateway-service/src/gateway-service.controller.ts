@@ -15,18 +15,15 @@ export class GatewayServiceController {
     return this.gatewayServiceService.getHello();
   }
 
-  // @Post()
-  // createOrderEvent(@Body() paylaod: CreateOrderDto) {
-  //   return this.gatewayServiceService.createOrder(paylaod);
-  // }
-
   @Post()
   kafkatest(@Body() payload: CreateOrderDto) {
     console.log('++++++PRODUCING+++++++=');
     console.log(payload);
     console.log('++++++PRODUCED+++++++=');
-    return this.producerService.produce({
-      value: 'My name is =========',
+    this.producerService.produce({
+      value: JSON.stringify(payload),
     });
+
+    return 'SUCCESS';
   }
 }

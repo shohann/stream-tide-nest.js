@@ -8,7 +8,6 @@ export class NotificationServiceService {
   }
 
   handleOrderCreated(data: OrderCreatedEvent) {
-    // console.log(data.value);
     console.log(data.orderId);
   }
 }

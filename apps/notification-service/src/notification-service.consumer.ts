@@ -3,7 +3,7 @@ import { KafkaConsumerService } from '@app/kafka/kafka.consumer.service';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
 @Injectable()
-export class TestConsumer implements OnModuleInit {
+export class NotificationTestConsumer implements OnModuleInit {
   constructor(
     private readonly config: AppConfigService,
     private readonly consumer: KafkaConsumerService,
@@ -14,7 +14,8 @@ export class TestConsumer implements OnModuleInit {
       topic: { topic: this.config.kafka.topic },
       config: { groupId: 'test-consumer' },
       onMessage: async (message) => {
-        console.log({ value: message.value.toString() });
+        // console.log({ value: message.value.toString() });
+        console.log(JSON.parse(message.value.toString()));
       },
     });
   }
