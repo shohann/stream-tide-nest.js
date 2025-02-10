@@ -1,16 +1,16 @@
 import { AppConfigService } from '@app/config';
 import { Injectable, OnApplicationShutdown } from '@nestjs/common';
 import {
+  // ConsumerSubscribeTopic,
   ConsumerConfig,
-  ConsumerSubscribeTopic,
-  //   ConsumerSubscribeTopics,
+  ConsumerSubscribeTopics,
   KafkaMessage,
 } from 'kafkajs';
 import { KafkaConsumer } from './consumer.service';
 
 interface KafkajsConsumerOptions {
-  topic: ConsumerSubscribeTopic;
-  //   topic: ConsumerSubscribeTopics;
+  // topic: ConsumerSubscribeTopic;
+  topic: ConsumerSubscribeTopics;
   config: ConsumerConfig;
   onMessage: (message: KafkaMessage) => Promise<void>;
 }

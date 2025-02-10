@@ -1,15 +1,16 @@
 import {
   Consumer,
   ConsumerConfig,
-  ConsumerSubscribeTopic,
+  ConsumerSubscribeTopics,
   Kafka,
   KafkaMessage,
-  //   Producer,
+  // Producer,
 } from 'kafkajs';
-// import { IProducer } from './kafka.producer.service';
 import { Logger } from '@nestjs/common';
 import { IConsumer } from './kafka.consumer.service';
 import * as retry from 'async-retry';
+// import { IProducer } from './kafka.producer.service';
+// Added "s" ConsumerSubscribeTopics
 
 export const sleep = (timeout: number) => {
   return new Promise<void>((resolve) => setTimeout(resolve, timeout));
@@ -21,7 +22,7 @@ export class KafkaConsumer implements IConsumer {
   private readonly logger: Logger;
 
   constructor(
-    private readonly topic: ConsumerSubscribeTopic,
+    private readonly topic: ConsumerSubscribeTopics,
     config: ConsumerConfig,
     broker: string,
   ) {

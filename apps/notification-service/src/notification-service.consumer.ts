@@ -11,10 +11,9 @@ export class NotificationTestConsumer implements OnModuleInit {
 
   async onModuleInit() {
     await this.consumer.consume({
-      topic: { topic: this.config.kafka.topic },
+      topic: { topics: this.config.kafka.topic }, // TODO: Make test with multiple differnet topics
       config: { groupId: 'test-consumer' },
       onMessage: async (message) => {
-        // console.log({ value: message.value.toString() });
         console.log(JSON.parse(message.value.toString()));
       },
     });
