@@ -1,15 +1,9 @@
 import { AppConfigService } from '@app/config';
 import { Injectable, OnApplicationShutdown } from '@nestjs/common';
-import {
-  // ConsumerSubscribeTopic,
-  ConsumerConfig,
-  ConsumerSubscribeTopics,
-  KafkaMessage,
-} from 'kafkajs';
+import { ConsumerConfig, ConsumerSubscribeTopics, KafkaMessage } from 'kafkajs';
 import { KafkaConsumer } from './consumer.service';
 
 interface KafkajsConsumerOptions {
-  // topic: ConsumerSubscribeTopic;
   topic: ConsumerSubscribeTopics;
   config: ConsumerConfig;
   onMessage: (message: KafkaMessage) => Promise<void>;
@@ -20,6 +14,14 @@ export interface IConsumer {
   disconnect: () => Promise<void>;
   consume: (message: any) => Promise<void>;
 }
+
+///
+export interface ConsumerConfigs {
+  topics: string[];
+  groupId: string;
+  handler: (payload: any) => Promise<void>;
+}
+///
 
 @Injectable()
 export class KafkaConsumerService implements OnApplicationShutdown {
@@ -43,4 +45,31 @@ export class KafkaConsumerService implements OnApplicationShutdown {
       await consumer.disconnect();
     }
   }
+
+  ////
+  private createMessageHandler(
+    handler: (payload: any) => Promise<void>,
+  ): (message: { value: Buffer }) => Promise<void> {
+    return async (message: { value: Buffer }) => {
+      try {
+        const payload = JSON.parse(message.value.toString());
+        await handler(payload);
+      } catch (error) {
+        console.error('Error processing message', error);
+      }
+    };
+  }
+
+  async initConsumers(configs: ConsumerConfigs[]): Promise<void> {
+    await Promise.all(
+      configs.map(({ topics, groupId, handler }) =>
+        this.consume({
+          topic: { topics },
+          config: { groupId },
+          onMessage: this.createMessageHandler(handler),
+        }),
+      ),
+    );
+  }
+  ///
 }

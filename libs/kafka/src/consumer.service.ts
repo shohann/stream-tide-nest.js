@@ -4,13 +4,10 @@ import {
   ConsumerSubscribeTopics,
   Kafka,
   KafkaMessage,
-  // Producer,
 } from 'kafkajs';
 import { Logger } from '@nestjs/common';
 import { IConsumer } from './kafka.consumer.service';
 import * as retry from 'async-retry';
-// import { IProducer } from './kafka.producer.service';
-// Added "s" ConsumerSubscribeTopics
 
 export const sleep = (timeout: number) => {
   return new Promise<void>((resolve) => setTimeout(resolve, timeout));
