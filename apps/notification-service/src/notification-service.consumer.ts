@@ -1,7 +1,48 @@
-// import { AppConfigService } from '@app/config';
-// import { KafkaConsumerService } from '@app/kafka/kafka.consumer.service';
-// import { Injectable, OnModuleInit } from '@nestjs/common';
-// import { ConsumerManagerService } from '@app/kafka/consumer.manager';
+import { AppConfigService } from '@app/config';
+import { KafkaConsumerService } from '@app/kafka/kafka.consumer.service';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { OrderEventHandler } from './handlers/base.handler';
+import { OrderCreatedHandler } from './handlers/order-created.handler';
+import { OrderShippedHandler } from './handlers/order-shipped.handler';
+import { OrderPaymentCreatedHandler } from './handlers/order-payment-created.handler';
+
+@Injectable()
+export class NotificationTestConsumer implements OnModuleInit {
+  private eventHandlerMap: { [eventType: string]: OrderEventHandler } = {};
+
+  constructor(
+    private readonly config: AppConfigService,
+    private readonly consumer: KafkaConsumerService,
+    private readonly orderCreatedHandler: OrderCreatedHandler,
+    private readonly orderShippedHandler: OrderShippedHandler,
+    private readonly orderPaymentCreatedHandler: OrderPaymentCreatedHandler,
+  ) {}
+
+  async onModuleInit() {
+    this.eventHandlerMap = {
+      [this.orderCreatedHandler.eventType]: this.orderCreatedHandler,
+      [this.orderShippedHandler.eventType]: this.orderShippedHandler,
+      [this.orderPaymentCreatedHandler.eventType]:
+        this.orderPaymentCreatedHandler,
+    };
+
+    await this.consumer.consume({
+      topic: { topics: [this.config.kafka.topic] },
+      config: { groupId: 'test-consumer' },
+      onMessage: async (message) => {
+        const parsedMessage = JSON.parse(message.value.toString());
+        const eventType = parsedMessage.eventType;
+
+        const handler = this.eventHandlerMap[eventType];
+        if (handler) {
+          await handler.handleEvent(parsedMessage);
+        } else {
+          console.warn(`Unhandled order event type: ${eventType}`);
+        }
+      },
+    });
+  }
+}
 
 // @Injectable()
 // export class NotificationTestConsumer implements OnModuleInit {
@@ -15,60 +56,39 @@
 //       topic: { topics: [this.config.kafka.topic] },
 //       config: { groupId: 'test-consumer' },
 //       onMessage: async (message) => {
-//         console.log(JSON.parse(message.value.toString()));
+//         const parsedMessage = JSON.parse(message.value.toString());
+
+//         if (parsedMessage.eventType === 'OrderCreated') {
+//           this.handleOrderCreated(parsedMessage);
+//         } else if (parsedMessage.eventType === 'OrderShiped') {
+//           this.handleOrderShipped(parsedMessage);
+//         } else if (parsedMessage.eventType === 'OrderPaymentCreated') {
+//           this.handleOrderPaymentCreated(parsedMessage);
+//         } else {
+//           console.warn(
+//             `Unhandled order event type: ${parsedMessage.eventType}`,
+//           );
+//         }
 //       },
 //     });
 //   }
+
+//   private handleOrderCreated(parsedMessage: any) {
+//     console.log(parsedMessage);
+//     console.log('Order created');
+//   }
+
+//   private handleOrderShipped(parsedMessage: any) {
+//     console.log(parsedMessage);
+//     console.log('Order created');
+//   }
+
+//   private handleOrderPaymentCreated(parsedMessage: any) {
+//     console.log(parsedMessage);
+//     console.log('Order created');
+//   }
 // }
 
+////////////////////
 // TODO: Make test with multiple differnet topics
 // TODO: Handle event based on event
-
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { AppConfigService } from '@app/config';
-import { KafkaConsumerService } from '@app/kafka/kafka.consumer.service';
-import { ConsumerConfigs } from '@app/kafka/kafka.consumer.service';
-
-interface NotificationPayload {
-  userId: string;
-  price: number;
-}
-
-@Injectable()
-export class NotificationTestConsumer implements OnModuleInit {
-  constructor(
-    private readonly config: AppConfigService,
-    private readonly consumerManager: KafkaConsumerService, // ConsumerManagerService
-  ) {}
-
-  /**
-   * Defines Kafka consumer configurations for this module.
-   */
-  private getConsumerConfigs(): ConsumerConfigs[] {
-    return [
-      {
-        topics: [this.config.kafka.topic], // Fetch topic from config
-        groupId: 'notification-consumer', // Unique group for notifications
-        handler: this.handleNotification.bind(this), // Bind method for message handling
-      },
-    ];
-  }
-
-  /**
-   * Initializes consumers when the module starts.
-   */
-  async onModuleInit() {
-    await this.consumerManager.initConsumers(this.getConsumerConfigs());
-  }
-
-  /**
-   * Processes incoming notification messages.
-   * @param payload The parsed Kafka message payload
-   */
-  private async handleNotification(
-    payload: NotificationPayload,
-  ): Promise<void> {
-    console.log('Received Notification:', payload.price);
-    // Implement business logic for handling notifications
-  }
-}

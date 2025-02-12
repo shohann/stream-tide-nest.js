@@ -21,7 +21,12 @@ export class GatewayServiceController {
     console.log(payload);
     console.log('++++++PRODUCED+++++++=');
     this.producerService.produce({
-      value: JSON.stringify(payload),
+      value: JSON.stringify({
+        // eventType: 'OrderPaymentCreated',
+        eventType: 'OrderShiped',
+        // eventType: 'OrderCreated',
+        ...payload,
+      }),
     });
 
     return 'SUCCESS';

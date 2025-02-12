@@ -15,14 +15,6 @@ export interface IConsumer {
   consume: (message: any) => Promise<void>;
 }
 
-///
-export interface ConsumerConfigs {
-  topics: string[];
-  groupId: string;
-  handler: (payload: any) => Promise<void>;
-}
-///
-
 @Injectable()
 export class KafkaConsumerService implements OnApplicationShutdown {
   private readonly consumers: IConsumer[] = [];
@@ -45,31 +37,4 @@ export class KafkaConsumerService implements OnApplicationShutdown {
       await consumer.disconnect();
     }
   }
-
-  ////
-  private createMessageHandler(
-    handler: (payload: any) => Promise<void>,
-  ): (message: { value: Buffer }) => Promise<void> {
-    return async (message: { value: Buffer }) => {
-      try {
-        const payload = JSON.parse(message.value.toString());
-        await handler(payload);
-      } catch (error) {
-        console.error('Error processing message', error);
-      }
-    };
-  }
-
-  async initConsumers(configs: ConsumerConfigs[]): Promise<void> {
-    await Promise.all(
-      configs.map(({ topics, groupId, handler }) =>
-        this.consume({
-          topic: { topics },
-          config: { groupId },
-          onMessage: this.createMessageHandler(handler),
-        }),
-      ),
-    );
-  }
-  ///
 }

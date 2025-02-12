@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrderCreatedEvent } from 'apps/gateway-service/src/notification.created';
+// import { OrderCreatedEvent } from 'apps/gateway-service/src/notification.created';
 
 @Injectable()
 export class NotificationServiceService {
@@ -7,7 +7,7 @@ export class NotificationServiceService {
     return 'Hello World!';
   }
 
-  handleOrderCreated(data: OrderCreatedEvent) {
-    console.log(data.orderId);
-  }
+  // handleOrderCreated(data: OrderCreatedEvent) {
+  //   console.log(data.orderId);
+  // }
 }
